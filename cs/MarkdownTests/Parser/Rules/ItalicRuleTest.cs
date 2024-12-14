@@ -50,6 +50,7 @@ public class ItalicRuleTest
         var node = rule.Match(tokens, begin) as TagNode;
         
         node.Should().NotBeNull();
+        node.NodeType.Should().Be(NodeType.Italic);
         node.Children.Should().ContainSingle(n => n.NodeType == NodeType.Text);
         return node.ToText(tokens);
     }
