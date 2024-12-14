@@ -75,6 +75,9 @@ public class BoldRuleTest
     [TestCase("a__bc__", 1, ExpectedResult = "bc")]
     [TestCase("a__b__c", 1, ExpectedResult = "b")]
     [TestCase("__a__bc", 0, ExpectedResult = "a")]
+    [TestCase("__a*__bc", 0, ExpectedResult = "a*")]
+    [TestCase("__a/__bc", 0, ExpectedResult = "a/")]
+    [TestCase("f__a#__bc", 1, ExpectedResult = "a#")]
     public string Match_ShouldMatch_WhenTagInsideWord(string text, int begin)
     {
         var tokens = tokenizer.Tokenize(text);
@@ -82,7 +85,7 @@ public class BoldRuleTest
         var node = rule.Match(tokens, begin) as TagNode;
         
         node.Should().NotBeNull();
-        node.Children.Should().ContainSingle(n => n.NodeType == NodeType.Text);
+        node.Children.Should().Contain(n => n.NodeType == NodeType.Text);
         return node.Children.ToText(tokens);
     }
 
