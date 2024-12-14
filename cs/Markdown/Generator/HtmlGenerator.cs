@@ -31,7 +31,7 @@ public class HtmlGenerator : IGenerator
             => $"<li>{RenderChildren(children, tokens)}</li>",
         
         TagNode { NodeType: NodeType.Header, Children: var children } 
-            => $"<h1>{RenderChildren(children, tokens)}</h1>",
+            => $"<h{children.First().Consumed}>{RenderChildren(children[1..], tokens)}</h{children.First().Consumed}>",
         
         TagNode { NodeType: NodeType.Bold, Children: var children } 
             => $"<strong>{RenderChildren(children, tokens)}</strong>",
