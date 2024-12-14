@@ -13,22 +13,23 @@ public class Tests
         const int scale = 2;
         var sw = new Stopwatch();
         var results = new List<TimeSpan>();
-        for (var len = 640; len <= 655360; len *= scale)
+        for (var len = 640; len <= 1310720; len *= scale)
         {
             var markdown = GenerateMarkdown(len);
             GC.Collect();
             sw.Start();
             Md.Render(markdown);
             sw.Stop();
-            
+
             results.Add(sw.Elapsed);
             sw.Reset();
         }
-        
+
         Enumerable.Range(1, results.Count - 1)
             .Select(i => (double)results[i].Ticks / results[i - 1].Ticks)
             .Should().OnlyContain(timeRatio => timeRatio < scale * scale);
     }
+
     private static string GenerateMarkdown(int len)
     {
         var rand = new Random();
