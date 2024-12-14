@@ -17,7 +17,11 @@ public class BoldRule : IParsingRule
     
     private static TagNode? MatchBold(List<Token> tokens, int begin = 0)
     {
-        var valueRule = new OrRule(new ItalicRule(), new TextRule());
+        var valueRule = new OrRule([
+            new ItalicRule(), 
+            new TextRule(),
+            new PatternRule(TokenType.Backslash)
+        ]);
         var pattern = new AndRule([
             PatternRuleFactory.DoubleUnderscore(),
             new ConditionalRule(new KleeneStarRule(valueRule), HasRightBorders),
