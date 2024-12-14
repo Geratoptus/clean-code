@@ -10,6 +10,8 @@ public class SpecScannerTest
 {
 
     [TestCase(" ", 0, TokenType.Space)]
+    [TestCase("\u00a0", 0, TokenType.Space)]
+    [TestCase("\u200b", 0, TokenType.Space)]
     [TestCase("*", 0, TokenType.Asterisk)]
     [TestCase("\n", 0, TokenType.Newline)]
     [TestCase("#", 0, TokenType.Octothorpe)]
