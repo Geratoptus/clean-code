@@ -22,7 +22,7 @@ public class SpecScannerTest
     {
         var scanner = new SpecScanner();
         
-        var token = scanner.Scan(text, begin);
+        var token = scanner.Scan(GetMemorySlice(text, begin));
         
         token?.TokenType.Should().Be(expectedType);
     }
@@ -36,8 +36,10 @@ public class SpecScannerTest
     {
         var scanner = new SpecScanner();
         
-        var token = scanner.Scan(text, begin);
+        var token = scanner.Scan(GetMemorySlice(text, begin));
         
         token.Should().BeNull();
     }
+    
+    private static Memory<char> GetMemorySlice(string text, int begin) => new(text.ToCharArray()[begin..]);
 }

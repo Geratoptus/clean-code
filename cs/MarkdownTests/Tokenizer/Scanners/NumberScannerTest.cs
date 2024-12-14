@@ -18,7 +18,7 @@ public class NumberScannerTest
     {
         var scanner = new NumberScanner();
         
-        var token = scanner.Scan(text, begin);
+        var token = scanner.Scan(GetMemorySlice(text, begin));
 
         token.Should().NotBeNull();
         token.TokenType.Should().Be(TokenType.Number);
@@ -33,7 +33,7 @@ public class NumberScannerTest
     {
         var scanner = new NumberScanner();
         
-        var token = scanner.Scan(text, begin);
+        var token = scanner.Scan(GetMemorySlice(text, begin));
         
         token.Should().BeNull();
     }
@@ -45,8 +45,10 @@ public class NumberScannerTest
     {
         var scanner = new NumberScanner();
         
-        var token = scanner.Scan(text, begin);
+        var token = scanner.Scan(GetMemorySlice(text, begin));
         
         token?.Value.Length.Should().Be(expectedLength);
     }
+
+    private static Memory<char> GetMemorySlice(string text, int begin) => new(text.ToCharArray()[begin..]);
 }
