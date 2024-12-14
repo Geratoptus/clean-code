@@ -21,6 +21,36 @@ public class HeaderRuleTest
         var node = rule.Match(tokens) as TagNode;
         
         node.Should().NotBeNull();
+        node.NodeType.Should().Be(NodeType.Header);
+
+    }
+
+    [TestCase("# abc def ghi")]
+    [TestCase("## abc def ghi")]
+    [TestCase("### abc def ghi")]
+    [TestCase("#### abc def ghi")]
+    [TestCase("##### abc def ghi")]
+    [TestCase("###### abc def ghi")]
+    public void Match_ShouldMatch_AllTypeOfExistingHeaders(string text)
+    {
+        var tokens = tokenizer.Tokenize($"{text}\n");
+
+        var node = rule.Match(tokens) as TagNode;
+        
+        node.Should().NotBeNull();
+        node.NodeType.Should().Be(NodeType.Header);
+    }
+
+    [TestCase("####### abc def ghi")]
+    [TestCase("######## abc def ghi")]
+    public void Match_ShouldNotMatch_NotExistingHeaders(string text)
+    {
+        
+        var tokens = tokenizer.Tokenize($"{text}\n");
+        
+        var node = rule.Match(tokens) as TagNode;
+        
+        node.Should().BeNull();
     }
 
     [TestCase("_abc_")]
@@ -37,6 +67,7 @@ public class HeaderRuleTest
         var node = rule.Match(tokens) as TagNode;
         
         node.Should().NotBeNull();
+        node.NodeType.Should().Be(NodeType.Header);
     }
 
     [Test]
