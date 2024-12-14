@@ -10,10 +10,10 @@ public class Tests
     [Test]
     public void Markdown_Render_ShouldWorkFast()
     {
-        const int scale = 2;
+        const int scale = 10;
         var sw = new Stopwatch();
         var results = new List<TimeSpan>();
-        for (var len = 640; len <= 1310720; len *= scale)
+        for (var len = 10; len <= 1000000; len *= scale)
         {
             var markdown = GenerateMarkdown(len);
             GC.Collect();
@@ -27,7 +27,7 @@ public class Tests
 
         Enumerable.Range(1, results.Count - 1)
             .Select(i => (double)results[i].Ticks / results[i - 1].Ticks)
-            .Should().OnlyContain(timeRatio => timeRatio < scale * scale);
+            .Should().OnlyContain(timeRatio => timeRatio < Math.Log2(scale) * scale);
     }
 
     private static string GenerateMarkdown(int len)
