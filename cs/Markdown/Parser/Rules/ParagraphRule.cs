@@ -11,7 +11,7 @@ public class ParagraphRule: IParsingRule
     public Node? Match(List<Token> tokens, int begin = 0)
     {
         var tagRules = new OrRule([
-            new EscapeRule(TokenType.Underscore),
+            new EscapeRule([TokenType.Underscore, TokenType.Backslash]),
             new ItalicRule(), new BoldRule(), new TextRule(),
         ]);
         var tokenRules = new OrRule([
