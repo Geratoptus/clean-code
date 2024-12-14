@@ -39,10 +39,6 @@ public class InWordBoldRule : IParsingRule
         PatternRuleFactory.DoubleUnderscore(),
         new KleeneStarRule(ValueRule)
     ]);
-    // private static readonly PatternRule InStartRule = new([
-    //     TokenType.Underscore, TokenType.Underscore, TokenType.Word, 
-    //     TokenType.Underscore, TokenType.Underscore, TokenType.Word,
-    // ]);
     
     public Node? Match(List<Token> tokens, int begin = 0) 
         => ResultRule.Match(tokens, begin) is SpecNode node ? BuildNode(node) : null;
