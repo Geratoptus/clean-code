@@ -12,9 +12,18 @@ public class InWordBoldRule : IParsingRule
     [
         TokenType.Newline, TokenType.Space, TokenType.Word
     ];
+    
+    private static readonly List<IParsingRule> AdditionalTextSymbols =
+    [
+        new PatternRule(TokenType.Asterisk), new PatternRule(TokenType.Backslash), new PatternRule(TokenType.Octothorpe)
+    ];
 
-
-    private static readonly OrRule ValueRule = new(new InWordItalicRule(), new PatternRule(TokenType.Word));
+    private static readonly OrRule ValueRule = new([
+        new InWordItalicRule(),
+        new PatternRule(TokenType.Word),
+        new OrRule(AdditionalTextSymbols)
+    ]);
+    
     private static readonly AndRule Pattern = new([
         PatternRuleFactory.DoubleUnderscore(),
         new KleeneStarRule(ValueRule),
@@ -23,11 +32,17 @@ public class InWordBoldRule : IParsingRule
     private static readonly OrRule ContinuesRule = new(PossibleContinues);
 
     private static readonly ContinuesRule ResultRule = new(Pattern, ContinuesRule);
-    
-    private static readonly PatternRule InStartRule = new([
-        TokenType.Underscore, TokenType.Underscore, TokenType.Word, 
-        TokenType.Underscore, TokenType.Underscore, TokenType.Word,
+
+    private static readonly AndRule InStartRule = new([
+        PatternRuleFactory.DoubleUnderscore(),
+        new KleeneStarRule(ValueRule),
+        PatternRuleFactory.DoubleUnderscore(),
+        new KleeneStarRule(ValueRule)
     ]);
+    // private static readonly PatternRule InStartRule = new([
+    //     TokenType.Underscore, TokenType.Underscore, TokenType.Word, 
+    //     TokenType.Underscore, TokenType.Underscore, TokenType.Word,
+    // ]);
     
     public Node? Match(List<Token> tokens, int begin = 0) 
         => ResultRule.Match(tokens, begin) is SpecNode node ? BuildNode(node) : null;
