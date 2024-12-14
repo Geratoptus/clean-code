@@ -1,8 +1,8 @@
-using Markdown.Tokens;
 using FluentAssertions;
 using Markdown.Tokenizer.Scanners;
+using Markdown.Tokens;
 
-namespace MarkdownTests.Scanners;
+namespace MarkdownTests.Tokenizer.Scanners;
 
 [TestFixture]
 [TestOf(typeof(TextScanner))]

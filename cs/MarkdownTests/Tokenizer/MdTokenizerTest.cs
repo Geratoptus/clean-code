@@ -2,7 +2,7 @@ using System.Text;
 using FluentAssertions;
 using Markdown.Tokenizer;
 
-namespace MarkdownTests;
+namespace MarkdownTests.Tokenizer;
 
 [TestFixture]
 [TestOf(typeof(MdTokenizer))]
