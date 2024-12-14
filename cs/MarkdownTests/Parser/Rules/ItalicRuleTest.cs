@@ -27,6 +27,19 @@ public class ItalicRuleTest
         node.ToText(tokens).Should().Be(text);
     }
 
+    
+    [TestCase("ab#c d/ef g*hi jkl")]
+    [TestCase("#/*")]
+    public void Match_ShouldMatch_TextWithSpecialCharacters(string text)
+    {
+        var tokens = tokenizer.Tokenize($"_{text}_");
+        
+        var node = rule.Match(tokens) as TagNode;
+        
+        node.Should().NotBeNull();
+        node.NodeType.Should().Be(NodeType.Italic);
+    }
+    
     [TestCase("abc def ghi_123_jkl", 5)]
     [TestCase("def 12_34_56 ghi jkl", 3)]
     public void Match_ShouldNotMatch_TextWithNumbers(string text, int begin)
@@ -43,6 +56,9 @@ public class ItalicRuleTest
     [TestCase("abc _de_fghi", 2, ExpectedResult = "de")]
     [TestCase("_ab_c", 0, ExpectedResult = "ab")]
     [TestCase("ab_c_", 1, ExpectedResult = "c")]
+    [TestCase("a_*b_", 1, ExpectedResult = "*b")]
+    [TestCase("a_/b_", 1, ExpectedResult = "/b")]
+    [TestCase("a_#b_", 1, ExpectedResult = "#b")]
     public string Match_ShouldMatch_TagInWord(string text, int begin)
     {
         var tokens = tokenizer.Tokenize(text);
