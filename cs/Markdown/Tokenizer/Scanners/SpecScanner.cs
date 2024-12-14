@@ -4,9 +4,10 @@ namespace Markdown.Tokenizer.Scanners;
 
 public class SpecScanner : ITokenScanner
 {
-    public Token? Scan(string text, int begin = 0)
+    public Token? Scan(Memory<char> textSlice)
     {
-        var tokenType = GetTokenType(text[begin]);
+        var tokenValue = textSlice.Span[0];
+        var tokenType = GetTokenType(tokenValue);
         
         if (tokenType is null)
         {
@@ -14,7 +15,7 @@ public class SpecScanner : ITokenScanner
         }
         var notNullType = (TokenType)tokenType;
         
-        return new Token(notNullType, begin, 1, text);
+        return new Token(notNullType, tokenValue.ToString());
     }
 
     public static bool CanScan(char symbol) => GetTokenType(symbol) != null;

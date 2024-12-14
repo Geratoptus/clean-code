@@ -1,16 +1,21 @@
+using System.Collections;
 using Markdown.Tokens;
 
 namespace Markdown.Tokenizer.Scanners;
 
 public class NumberScanner : ITokenScanner
 {
-    public Token? Scan(string text, int begin = 0)
+    public Token? Scan(Memory<char> textSlice)
     {
-        var numberEnumerable = text
-            .Skip(begin)
-            .TakeWhile(CanScan);
-        var numberLength = numberEnumerable.Count();
-        return numberLength == 0 ? null : new Token(TokenType.Number, begin, numberLength, text);
+        var numberLength = 0;
+        var textSpan = textSlice.Span;
+        
+        while (numberLength < textSpan.Length && CanScan(textSpan[numberLength]))
+        {
+            numberLength++;
+        }
+        
+        return numberLength == 0 ? null : new Token(TokenType.Number, textSlice[..numberLength].ToString());
     }
 
     public static bool CanScan(char symbol) => char.IsDigit(symbol);

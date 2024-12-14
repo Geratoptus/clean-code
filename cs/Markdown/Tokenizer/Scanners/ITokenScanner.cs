@@ -4,5 +4,5 @@ namespace Markdown.Tokenizer.Scanners;
 
 public interface ITokenScanner
 {
-    public Token? Scan(string text, int begin);
+    public Token? Scan(Memory<char> textSlice);
 }

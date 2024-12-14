@@ -4,13 +4,16 @@ namespace Markdown.Tokenizer.Scanners;
 
 public class TextScanner : ITokenScanner
 {
-    public Token? Scan(string text, int begin = 0)
+    public Token? Scan(Memory<char> textSlice)
     {
-        var valueEnumerable = text
-            .Skip(begin)
-            .TakeWhile(CanScan);
-        var valueLen = valueEnumerable.Count();
-        return valueLen == 0 ? null : new Token(TokenType.Word, begin, valueLen, text);
+        var valueLength = 0;
+        var textSpan = textSlice.Span;
+        
+        while (valueLength < textSpan.Length && CanScan(textSpan[valueLength]))
+        {
+            valueLength++;
+        }
+        return valueLength == 0 ? null : new Token(TokenType.Word, textSlice[..valueLength].ToString());
     }
 
     private static bool CanScan(char symbol) 
