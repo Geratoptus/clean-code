@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using Markdown.Parser.Nodes;
 using Markdown.Parser.Rules.BoolRules;
 using Markdown.Parser.Rules.Tools;
@@ -20,9 +21,14 @@ public class ItalicRule : IParsingRule
         new PatternRule(TokenType.Space),
     ];
     
+    private static readonly List<IParsingRule> AdditionalTextSymbols =
+    [
+        new PatternRule(TokenType.Asterisk), new PatternRule(TokenType.Backslash), new PatternRule(TokenType.Octothorpe)
+    ];
+    
     private static readonly OrRule ValueRule = new([
         new TextRule(), 
-        new PatternRule(TokenType.Backslash), 
+        new OrRule(AdditionalTextSymbols), 
         InnerBoldRule]);
         
     private static readonly AndRule Pattern = new([
@@ -46,7 +52,9 @@ public class ItalicRule : IParsingRule
 
     private static TagNode BuildNode(SpecNode node)
     {
-        var valueNode = (node.Nodes.Second() as SpecNode)!;
+        var valueNode = (node.Nodes.Second() as SpecNode);
+        
+        Debug.Assert(valueNode != null, nameof(valueNode) + " != null");
         return new TagNode(NodeType.Italic, valueNode.Nodes, node.Start, node.Consumed);
     }
     

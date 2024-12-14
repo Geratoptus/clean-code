@@ -11,10 +11,15 @@ public class InWordItalicRule : IParsingRule
     [
         TokenType.Newline, TokenType.Space, TokenType.Word
     ];
+
+    private static readonly List<IParsingRule> AdditionalTextSymbols =
+    [
+        new PatternRule(TokenType.Asterisk), new PatternRule(TokenType.Backslash), new PatternRule(TokenType.Octothorpe)
+    ];
     
     private static readonly AndRule Pattern = new([
         new PatternRule(TokenType.Underscore), 
-        new KleeneStarRule(new OrRule(new PatternRule(TokenType.Word), new PatternRule(TokenType.Backslash))), 
+        new KleeneStarRule(new OrRule(new PatternRule(TokenType.Word), new OrRule(AdditionalTextSymbols))), 
         new PatternRule(TokenType.Underscore),
     ]);
     

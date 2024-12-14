@@ -15,11 +15,17 @@ public class BoldRule : IParsingRule
             : new InWordBoldRule().Match(tokens, begin);
     }
     
+    private static readonly List<IParsingRule> AdditionalTextSymbols =
+    [
+        new PatternRule(TokenType.Asterisk), new PatternRule(TokenType.Backslash), new PatternRule(TokenType.Octothorpe)
+    ];
+    
     private static readonly IParsingRule ValueRule = new OrRule([
         new ItalicRule(), 
         new TextRule(),
-        new PatternRule(TokenType.Backslash)
+        new OrRule(AdditionalTextSymbols)
     ]);
+    
     
     private static readonly IParsingRule Pattern = new AndRule([
         PatternRuleFactory.DoubleUnderscore(),
