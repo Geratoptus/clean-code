@@ -6,8 +6,5 @@ namespace Markdown.Parser;
 
 public static class TokenParser
 {
-    public static Node? Parse(List<Token> tokens)
-    {
-        return new BodyRule().Match(tokens);
-    }
+    public static Node? Parse(List<Token> tokens) => new BodyRule().Match(tokens);
 }

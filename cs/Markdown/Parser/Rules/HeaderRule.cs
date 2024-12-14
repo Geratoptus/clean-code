@@ -8,14 +8,12 @@ namespace Markdown.Parser.Rules;
 
 public class HeaderRule : IParsingRule
 {
-    public Node? Match(List<Token> tokens, int begin = 0)
-    {
-        var resultRule = new AndRule([
-            new PatternRule([TokenType.Octothorpe, TokenType.Space]),
-            new ParagraphRule(),
-        ]);
-        return resultRule.Match(tokens, begin) is SpecNode node ? BuildNode(node) : null;
-    }
+    private readonly AndRule resultRule = new([
+        new PatternRule([TokenType.Octothorpe, TokenType.Space]),
+        new ParagraphRule(),
+    ]);
+    public Node? Match(List<Token> tokens, int begin = 0) 
+        => resultRule.Match(tokens, begin) is SpecNode node ? BuildNode(node) : null;
 
     private static TagNode BuildNode(SpecNode specNode)
     {

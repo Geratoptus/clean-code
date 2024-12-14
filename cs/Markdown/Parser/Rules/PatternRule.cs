@@ -28,6 +28,7 @@ public class PatternRule(List<TokenType> pattern) : IParsingRule
             .Take(pattern.Count)
             .Zip(pattern)
             .All(pair => pair.First.TokenType == pair.Second);
+        
         return !isMatched ? null : new TextNode(begin, pattern.Count);
     }
 }

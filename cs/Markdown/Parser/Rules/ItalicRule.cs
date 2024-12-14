@@ -7,46 +7,49 @@ namespace Markdown.Parser.Rules;
 
 public class ItalicRule : IParsingRule
 {
-    private readonly AndRule innerBoldRule = new([
+    private static readonly AndRule InnerBoldRule = new([
         PatternRuleFactory.DoubleUnderscore(),
         new KleeneStarRule(new OrRule([new PatternRule(TokenType.Backslash), new TextRule()])),
         PatternRuleFactory.DoubleUnderscore()
     ]);
-    private readonly List<IParsingRule> possibleContinues =
+    
+    private static readonly List<IParsingRule> PossibleContinues =
     [
         PatternRuleFactory.DoubleUnderscore(),
         new PatternRule(TokenType.Newline),
         new PatternRule(TokenType.Space),
     ];
     
-    public Node? Match(List<Token> tokens, int begin = 0)
-    {
-        return !InWordItalicRule.IsTagInWord(tokens, begin)
+    private static readonly OrRule ValueRule = new([
+        new TextRule(), 
+        new PatternRule(TokenType.Backslash), 
+        InnerBoldRule]);
+        
+    private static readonly AndRule Pattern = new([
+        new PatternRule(TokenType.Underscore),
+        new ConditionalRule(new KleeneStarRule(ValueRule), HasRightBorders),
+        new PatternRule(TokenType.Underscore),
+    ]);
+    
+    private static readonly OrRule ContinuesRule = new(PossibleContinues);
+        
+    private static readonly ContinuesRule ResultRule = new(Pattern, ContinuesRule);
+
+    
+    public Node? Match(List<Token> tokens, int begin = 0) 
+        => !InWordItalicRule.IsTagInWord(tokens, begin)
             ? MatchItalic(tokens, begin)
             : new InWordItalicRule().Match(tokens, begin);
-    }
-    private TagNode? MatchItalic(List<Token> tokens, int begin)
-    {
-        var valueRule = new OrRule([
-            new TextRule(), 
-            new PatternRule(TokenType.Backslash), 
-            innerBoldRule]);
-        
-        var pattern = new AndRule([
-            new PatternRule(TokenType.Underscore),
-            new ConditionalRule(new KleeneStarRule(valueRule), HasRightBorders),
-            new PatternRule(TokenType.Underscore),
-        ]);
-        var continuesRule = new OrRule(possibleContinues);
-        
-        var resultRule = new ContinuesRule(pattern, continuesRule);
-        return resultRule.Match(tokens, begin) is SpecNode specNode ? BuildNode(specNode) : null;
-    }
+
+    private static TagNode? MatchItalic(List<Token> tokens, int begin) 
+        => ResultRule.Match(tokens, begin) is SpecNode specNode ? BuildNode(specNode) : null;
+
     private static TagNode BuildNode(SpecNode node)
     {
         var valueNode = (node.Nodes.Second() as SpecNode)!;
         return new TagNode(NodeType.Italic, valueNode.Nodes, node.Start, node.Consumed);
     }
+    
     private static bool HasRightBorders(Node node, List<Token> tokens)
         => tokens[node.End].TokenType != TokenType.Space && tokens[node.Start].TokenType != TokenType.Space;
 }

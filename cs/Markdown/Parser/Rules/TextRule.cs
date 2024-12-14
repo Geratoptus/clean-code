@@ -12,6 +12,7 @@ public class TextRule : IParsingRule
             .Skip(begin)
             .TakeWhile(IsText)
             .Count();
+        
         return textLength == 0 ? null : new TextNode(begin, textLength);
     }
 

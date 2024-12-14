@@ -8,28 +8,27 @@ namespace Markdown.Parser.Rules;
 
 public class ParagraphRule: IParsingRule
 {
-    public Node? Match(List<Token> tokens, int begin = 0)
-    {
-        var tagRules = new OrRule([
-            new EscapeRule([TokenType.Underscore, TokenType.Backslash]),
-            new ItalicRule(), new BoldRule(), new TextRule(),
-        ]);
-        var tokenRules = new OrRule([
-            PatternRuleFactory.DoubleUnderscore(),
-            new PatternRule(TokenType.Number), 
-            new PatternRule(TokenType.Octothorpe),
-            new PatternRule(TokenType.Underscore),
-            new PatternRule(TokenType.Asterisk),
-            new PatternRule(TokenType.Backslash),
-        ]);
+    private static readonly OrRule TagRules = new([
+        new EscapeRule([TokenType.Underscore, TokenType.Backslash]),
+        new ItalicRule(), new BoldRule(), new TextRule(),
+    ]);
+    
+    private static readonly OrRule TokenRules = new([
+        PatternRuleFactory.DoubleUnderscore(),
+        new PatternRule(TokenType.Number), 
+        new PatternRule(TokenType.Octothorpe),
+        new PatternRule(TokenType.Underscore),
+        new PatternRule(TokenType.Asterisk),
+        new PatternRule(TokenType.Backslash),
+    ]);
 
-        var resultRule = new AndRule([
-            new KleeneStarRule(new OrRule(tagRules, tokenRules)),
-            new PatternRule(TokenType.Newline)
-        ]);
-        
-        return resultRule.Match(tokens, begin) is SpecNode node ? BuildNode(node) : null;
-    }
+    private static readonly AndRule ResultRule = new([
+        new KleeneStarRule(new OrRule(TagRules, TokenRules)),
+        new PatternRule(TokenType.Newline)
+    ]);
+    
+    public Node? Match(List<Token> tokens, int begin = 0) 
+        => ResultRule.Match(tokens, begin) is SpecNode node ? BuildNode(node) : null;
 
     private static TagNode BuildNode(SpecNode node)
     {

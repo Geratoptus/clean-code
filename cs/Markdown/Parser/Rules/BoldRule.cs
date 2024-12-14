@@ -15,23 +15,25 @@ public class BoldRule : IParsingRule
             : new InWordBoldRule().Match(tokens, begin);
     }
     
-    private static TagNode? MatchBold(List<Token> tokens, int begin = 0)
-    {
-        var valueRule = new OrRule([
-            new ItalicRule(), 
-            new TextRule(),
-            new PatternRule(TokenType.Backslash)
-        ]);
-        var pattern = new AndRule([
-            PatternRuleFactory.DoubleUnderscore(),
-            new ConditionalRule(new KleeneStarRule(valueRule), HasRightBorders),
-            PatternRuleFactory.DoubleUnderscore()
-        ]);
-        var continuesRule = new OrRule(TokenType.Newline, TokenType.Space);
+    private static readonly IParsingRule ValueRule = new OrRule([
+        new ItalicRule(), 
+        new TextRule(),
+        new PatternRule(TokenType.Backslash)
+    ]);
+    
+    private static readonly IParsingRule Pattern = new AndRule([
+        PatternRuleFactory.DoubleUnderscore(),
+        new ConditionalRule(new KleeneStarRule(ValueRule), HasRightBorders),
+        PatternRuleFactory.DoubleUnderscore()
+    ]);
+    
+    private static readonly IParsingRule ContinuesRule = new OrRule(TokenType.Newline, TokenType.Space);
         
-        var resultRule = new ContinuesRule(pattern, continuesRule);
-        return resultRule.Match(tokens, begin) is SpecNode specNode ? BuildNode(specNode) : null;
-    }
+    private static readonly ContinuesRule ResultRule = new(Pattern, ContinuesRule);
+    
+    private static TagNode? MatchBold(List<Token> tokens, int begin = 0) 
+        => ResultRule.Match(tokens, begin) is SpecNode specNode ? BuildNode(specNode) : null;
+
     private static TagNode BuildNode(SpecNode node)
     {
         var valueNode = (node.Nodes.Second() as SpecNode);

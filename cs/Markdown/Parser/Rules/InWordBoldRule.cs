@@ -8,28 +8,33 @@ namespace Markdown.Parser.Rules;
 
 public class InWordBoldRule : IParsingRule
 {
-    private readonly List<TokenType> possibleContinues =
+    private static readonly List<TokenType> PossibleContinues =
     [
         TokenType.Newline, TokenType.Space, TokenType.Word
     ];
 
-    public Node? Match(List<Token> tokens, int begin = 0)
-    {
-        var valueRule = new OrRule(new InWordItalicRule(), new PatternRule(TokenType.Word));
-        var pattern = new AndRule([
-            PatternRuleFactory.DoubleUnderscore(),
-            new KleeneStarRule(valueRule),
-            PatternRuleFactory.DoubleUnderscore(),
-        ]);
-        var continuesRule = new OrRule(possibleContinues);
 
-        var resultRule = new ContinuesRule(pattern, continuesRule);
-        return resultRule.Match(tokens, begin) is SpecNode node ? BuildNode(node) : null;
-    }
+    private static readonly OrRule ValueRule = new(new InWordItalicRule(), new PatternRule(TokenType.Word));
+    private static readonly AndRule Pattern = new([
+        PatternRuleFactory.DoubleUnderscore(),
+        new KleeneStarRule(ValueRule),
+        PatternRuleFactory.DoubleUnderscore(),
+    ]);
+    private static readonly OrRule ContinuesRule = new(PossibleContinues);
+
+    private static readonly ContinuesRule ResultRule = new(Pattern, ContinuesRule);
+    
+    private static readonly PatternRule InStartRule = new([
+        TokenType.Underscore, TokenType.Underscore, TokenType.Word, 
+        TokenType.Underscore, TokenType.Underscore, TokenType.Word,
+    ]);
+    
+    public Node? Match(List<Token> tokens, int begin = 0) 
+        => ResultRule.Match(tokens, begin) is SpecNode node ? BuildNode(node) : null;
 
     private static TagNode BuildNode(SpecNode node)
     {
-        var valueNode = (node.Nodes.Second() as SpecNode);
+        var valueNode = node.Nodes.Second() as SpecNode;
         Debug.Assert(valueNode != null, nameof(valueNode) + " != null");
         return new TagNode(NodeType.Bold, valueNode.Nodes, node.Start, node.Consumed);
     }
@@ -38,11 +43,7 @@ public class InWordBoldRule : IParsingRule
     {
         if (begin != 0 && tokens[begin - 1].TokenType == TokenType.Word) 
             return true;
-
-        var inStartRule = new PatternRule([
-            TokenType.Underscore, TokenType.Underscore, TokenType.Word, 
-            TokenType.Underscore, TokenType.Underscore, TokenType.Word,
-        ]);
-        return inStartRule.Match(tokens, begin) is not null;
+        
+        return InStartRule.Match(tokens, begin) is not null;
     }
 }

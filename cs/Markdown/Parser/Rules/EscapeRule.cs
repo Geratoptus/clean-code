@@ -11,15 +11,14 @@ public class EscapeRule(List<TokenType> escapedTokens) : IParsingRule
         : this([escapedTokenType])
     { }
 
+    private readonly AndRule resultRule = new([
+        new PatternRule(TokenType.Backslash),
+        new OrRule(escapedTokens)
+    ]);
     
-    public Node? Match(List<Token> tokens, int begin = 0)
-    {
-        var resultRule = new AndRule([
-            new PatternRule(TokenType.Backslash),
-            new OrRule(escapedTokens)
-        ]);
-        return resultRule.Match(tokens, begin) is SpecNode node ? BuildNode(node) : null;
-    }
+    public Node? Match(List<Token> tokens, int begin = 0) 
+        => resultRule.Match(tokens, begin) is SpecNode node ? BuildNode(node) : null;
+
     private static TagNode BuildNode(SpecNode node) 
         => new(NodeType.Escape, node.Nodes.Second() ?? throw new InvalidOperationException(), node.Start, node.Consumed);
 }

@@ -8,14 +8,12 @@ namespace Markdown.Parser.Rules;
 
 public class ListItemRule : IParsingRule
 {
-    public Node? Match(List<Token> tokens, int begin = 0)
-    {
-        var resultRule = new AndRule([
-            new PatternRule([TokenType.Asterisk, TokenType.Space]),
-            new ParagraphRule(),
-        ]);
-        return resultRule.Match(tokens, begin) is SpecNode node ? BuildNode(node) : null;
-    }
+    private static readonly AndRule ResultRule = new([
+        new PatternRule([TokenType.Asterisk, TokenType.Space]),
+        new ParagraphRule(),
+    ]);
+    public Node? Match(List<Token> tokens, int begin = 0) 
+        => ResultRule.Match(tokens, begin) is SpecNode node ? BuildNode(node) : null;
 
     private static TagNode BuildNode(SpecNode specNode)
     {
