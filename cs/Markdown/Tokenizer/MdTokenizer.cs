@@ -14,11 +14,14 @@ public class MdTokenizer
     {
         var begin = 0;
         var tokenList = new List<Token>();
-
+        var memoryText = new Memory<char>(text.ToCharArray());
+        
         while (begin < text.Length)
         {
+            var textSlice = memoryText[begin..];
+
             var token = scanners
-                .Select(scanner => scanner.Scan(text, begin))
+                .Select(scanner => scanner.Scan(textSlice))
                 .First(token => token != null);
 
             Debug.Assert(token != null, nameof(token) + " != null");
