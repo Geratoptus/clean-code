@@ -44,7 +44,7 @@ public class BodyRuleTest
         node.Should().NotBeNull();
         node.Children.Select(n => n.NodeType).Should().BeEquivalentTo(
             [NodeType.Header, NodeType.Paragraph], options => options.WithStrictOrdering());
-        node.ToText(tokens).Should().Be("abc def ghijkl mno pqr");
+        node.ToText(tokens).Should().Be("#abc def ghijkl mno pqr");
     }
     
     [Test]
