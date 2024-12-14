@@ -51,7 +51,7 @@ public class ItalicRuleTest
         
         node.Should().NotBeNull();
         node.NodeType.Should().Be(NodeType.Italic);
-        node.Children.Should().ContainSingle(n => n.NodeType == NodeType.Text);
+        node.Children.Should().ContainSingle(n => n.NodeType == NodeType.Special);
         return node.ToText(tokens);
     }
 

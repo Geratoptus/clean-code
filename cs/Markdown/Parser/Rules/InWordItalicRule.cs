@@ -16,7 +16,7 @@ public class InWordItalicRule : IParsingRule
     { 
         var pattern = new AndRule([
             new PatternRule(TokenType.Underscore), 
-            new PatternRule(TokenType.Word), 
+            new KleeneStarRule(new OrRule(new PatternRule(TokenType.Word), new PatternRule(TokenType.Backslash))), 
             new PatternRule(TokenType.Underscore),
         ]);
         var continuesRule = new OrRule(possibleContinues);

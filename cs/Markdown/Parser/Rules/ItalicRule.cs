@@ -9,7 +9,7 @@ public class ItalicRule : IParsingRule
 {
     private readonly AndRule innerBoldRule = new([
         PatternRuleFactory.DoubleUnderscore(),
-        new TextRule(),
+        new KleeneStarRule(new OrRule([new PatternRule(TokenType.Backslash), new TextRule()])),
         PatternRuleFactory.DoubleUnderscore()
     ]);
     private readonly List<IParsingRule> possibleContinues =
@@ -27,7 +27,11 @@ public class ItalicRule : IParsingRule
     }
     private TagNode? MatchItalic(List<Token> tokens, int begin)
     {
-        var valueRule = new OrRule(new TextRule(), innerBoldRule);
+        var valueRule = new OrRule([
+            new TextRule(), 
+            new PatternRule(TokenType.Backslash), 
+            innerBoldRule]);
+        
         var pattern = new AndRule([
             new PatternRule(TokenType.Underscore),
             new ConditionalRule(new KleeneStarRule(valueRule), HasRightBorders),
